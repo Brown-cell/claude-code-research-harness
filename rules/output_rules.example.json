@@ -61,7 +61,7 @@
       "kind": "require",
       "pattern": "\\b(?:should work|should be fine|probably works|ought to work|will work fine)\\b",
       "requires": "unverified|untested|not (?:yet )?(?:tested|verified|run)|have not (?:run|tested|verified)|did not run|assumption|I am guessing",
-      "message": "If you have not executed it, say so in the same sentence: 'unverified -- I have not run this on Windows'. Mixing what you ran with what you expect is the one failure mode that makes the whole report unusable, because the reader can no longer tell which half to trust.",
+      "message": "If you have not executed it, say so in the same sentence: 'unverified, I have not run this on Windows'. Mixing what you ran with what you expect is the one failure mode that makes the whole report unusable, because the reader can no longer tell which half to trust.",
       "negative": [
         "I ran the suite: 41 passed, 0 failed.",
         "This should work on Windows as well -- unverified, I only ran it on Linux.",

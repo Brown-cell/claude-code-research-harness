@@ -2,14 +2,14 @@
 """PostToolUse nudge: writing a rule as prose is the weakest enforcement there is.
 
 The case that settled it: a rule about file encoding was written into an
-operational guardrails document three separate times, and broken anyway -- once
+operational guardrails document three separate times, and broken anyway, once
 silently (a script exited 0 and did nothing), once loudly (a scheduled task died
 immediately). Three paragraphs, zero enforcement. Prose has no enforcement
 surface. Code does.
 
 So this hook fires at the exact moment prose is being written into a document
 whose job is to change future behaviour, and asks the one question that matters:
-can this be checked by a machine? It never blocks -- some rules genuinely cannot
+can this be checked by a machine? It never blocks, some rules genuinely cannot
 be checked, and saying so out loud is a legitimate answer. It just refuses to
 let "I wrote it down" pass unexamined. Once per file per session.
 
@@ -26,7 +26,7 @@ import sys
 TTL_SEC = 6 * 3600
 
 # Operational rule documents: places where a line is meant to change future
-# behaviour. Adjust to taste -- this is the one part that is local convention.
+# behaviour. Adjust to taste, this is the one part that is local convention.
 RULE_DOC = re.compile(
     r"(prompts[\\/][^\\/]*\.md"
     r"|docs[\\/][^\\/]*(?:protocol|standard|convention|rules?)[^\\/]*\.md"
@@ -35,14 +35,14 @@ RULE_DOC = re.compile(
     r"|[^\\/]*GUARDRAILS?[^\\/]*\.md"
     r"|[^\\/]*CHECKLIST[^\\/]*\.md)$", re.I)
 
-# Durable feedback belongs in the memory directory by design -- that IS the
+# Durable feedback belongs in the memory directory by design, that IS the
 # right home for a rule a machine cannot check, so firing there would be noise
 # rather than signal. (Learned the hard way: this hook's first live shot was a
 # memory file whose name merely contained the word "guardrails".)
 EXCLUDE = re.compile(r"[\\/]memory[\\/]", re.I)
 
 MSG = """[prose-rule] {name}
-  You are writing a rule as prose. Prose has no enforcement surface -- the file
+  You are writing a rule as prose. Prose has no enforcement surface, the file
   encoding rule sat in a guardrails document three times and was violated anyway.
   Before you finish this edit, answer one question and act on it:
 
@@ -55,7 +55,7 @@ MSG = """[prose-rule] {name}
       no  -> keep the prose, and say plainly in your reply that it is
              unenforced, so the user knows what they are relying on.
 
-  Default to the structural fix every time you notice a trap -- do not settle
+  Default to the structural fix every time you notice a trap, do not settle
   for another paragraph.
   (mechanism: hooks/prose_rule_guard.py)"""
 

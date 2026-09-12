@@ -6,7 +6,7 @@ WHY THIS EXISTS
 ---------------
 `output_rules_guard.py` is a **Stop** hook, so it lands after the message has
 already been written. It detects; it does not deter. Measured over six days of
-one setup's fire log, the top five rules rang 30, 27, 25, 25 and 14 times --
+one setup's fire log, the top five rules rang 30, 27, 25, 25 and 14 times,
 on six days out of six. The guard's own message says "if you hear the same
 thing twice, add a line to the rule table", and the firing did not stop. The
 problem was not a missing rule. The problem was that the rules arrive too late,
@@ -75,7 +75,7 @@ def log_path():
 
 
 def load_rules(store):
-    """{name: rule}. Empty if unreadable -- this hook never stops anything."""
+    """{name: rule}. Empty if unreadable, this hook never stops anything."""
     if store is None or not store.exists():
         return {}
     try:
@@ -123,7 +123,7 @@ def _short(s):
 
 
 def line_for(rule, name, count, ndays):
-    """One rule, one line. Say what to write -- do not scold."""
+    """One rule, one line. Say what to write, do not scold."""
     kind = rule.get("kind", "define")
     hits = f"[{count}x / {ndays}d]"
     if kind == "define":
@@ -131,7 +131,7 @@ def line_for(rule, name, count, ndays):
         return (f"  {hits} if you use \"{name}\", gloss it on the spot: "
                 f"\"{name} (= {gloss})\"")
     if kind == "forbid":
-        return f"  {hits} do not use \"{name}\" -- {_short(rule.get('message', ''))}"
+        return f"  {hits} do not use \"{name}\", {_short(rule.get('message', ''))}"
     return f"  {hits} if you write \"{name}\", {_short(rule.get('message', ''))}"
 
 

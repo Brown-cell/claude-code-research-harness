@@ -23,7 +23,7 @@ into "one more line of JSON" in under a minute.
 
 WHERE THE RULES LIVE
 --------------------
-`$CLAUDE_PROJECT_DIR/rules/output_rules.json` -- outside this directory on
+`$CLAUDE_PROJECT_DIR/rules/output_rules.json`, outside this directory on
 purpose. In the setup this grew out of, a guard protects everything under the
 hooks directory from being edited by the agent, so a rule table kept next to
 the code would need a human to unlock it for every new line. Code is dangerous
@@ -32,12 +32,12 @@ learned.
 
 THE THREE CHECKS
 ----------------
-  define  -- if the term appears, it must be glossed on the spot (within
+  define   if the term appears, it must be glossed on the spot (within
              NEAR characters) by a parenthesis containing "=". Already glossed
              earlier in the same conversation counts, so nothing has to be
              repeated every message.
-  forbid  -- the term must not be used. `message` says what to write instead.
-  require -- if `pattern` appears, `requires` must appear somewhere in the
+  forbid   the term must not be used. `message` says what to write instead.
+  require  if `pattern` appears, `requires` must appear somewhere in the
              same message.
 
 Demanding "a parenthesis containing =" rather than just "a parenthesis" is not
@@ -56,8 +56,8 @@ turn, because the fix is in a file the agent can edit right now. Set
 HARNESS_RULES_OPTIONAL=1 if you want a missing table to be allowed (useful
 while installing, or for a repository that has not written its rules yet).
 
-An unreadable transcript is different -- that is the harness misbehaving, not
-the author -- so it stays fail-open.
+An unreadable transcript is different, that is the harness misbehaving, not
+the author, so it stays fail-open.
 
 INSPECTION ENTRY POINT
 ----------------------
@@ -149,12 +149,12 @@ def load_rules(store):
         try:
             r["_re"] = re.compile(r["pattern"])
         except (KeyError, re.error) as e:
-            return [], f"rule {tag}: bad 'pattern' -- {e}"
+            return [], f"rule {tag}: bad 'pattern': {e}"
         if kind == "require":
             try:
                 r["_req"] = re.compile(r["requires"])
             except (KeyError, re.error) as e:
-                return [], f"rule {tag}: bad 'requires' -- {e}"
+                return [], f"rule {tag}: bad 'requires': {e}"
         if kind in ("forbid", "require"):
             # Admission test for wide nets. This hook runs on every single
             # message, so a rule whose net is too wide is a landmine that
@@ -179,7 +179,7 @@ def assistant_texts(transcript_path):
 
     Only the last TAIL_BYTES are read. A half line at the front fails to parse
     as JSON and is dropped on its own. If an old gloss falls out of the window
-    the worst case is being asked to gloss the term once more -- the failure
+    the worst case is being asked to gloss the term once more, the failure
     leans to the harmless side.
     """
     out = []
@@ -245,7 +245,7 @@ def quoted_spans(text):
 
     Found in real data: a forbidden word appeared inside a quotation of an
     existing plan. If a forbidden term cannot be quoted, you can no longer talk
-    *about* the rule -- this docstring could not be written. "Forbid" means
+    *about* the rule, this docstring could not be written. "Forbid" means
     "do not use it as your own word", not "this string may never appear".
     """
     return [m.span() for m in QUOTED.finditer(text)]
@@ -279,7 +279,7 @@ def log_fires(names, path):
 
     This used to keep 40 characters of context on each side, which made the log
     a path for sensitive sentences to leak into a file nobody was watching. The
-    only thing worth knowing here is which rule rings how often -- that is what
+    only thing worth knowing here is which rule rings how often, that is what
     tells you later whether a rule is an unfixed habit or a net that is too wide.
     """
     ts = datetime.datetime.now().isoformat(timespec="seconds")
@@ -316,8 +316,6 @@ def report(bad, store):
     for name, fix in bad:
         lines.append(f"    {name} -> {fix}")
     lines += [
-        "  When you put the same symbol at two different points in time, say which is",
-        "  measured and which is predicted.",
         "  If you are told the same thing twice, do not add a paragraph of prose:",
         f"  add one line to {store}",
         "  (mechanism: hooks/output_rules_guard.py)",

@@ -7,7 +7,7 @@ WHY IT IS A LIST AND NOT A POINTER
 The first version of this printed one file: the most recently modified handoff.
 Measured across several hundred transcripts, of 259 such hints only 41% were
 followed, and 16% were ignored while the session went and opened a *different*
-handoff -- that is, the hint had pointed at the wrong track. Running several
+handoff, that is, the hint had pointed at the wrong track. Running several
 threads in parallel is the normal case, so modification time can never key this
 correctly. There is no ranking that fixes it; the premise was wrong.
 
@@ -17,7 +17,7 @@ back to the reader, who is the only one who knows which track this thread is.
 
 The dated-file warning exists because the previous convention (one dated file
 per handoff) had grown to a couple of hundred files with no way to tell which
-was current. If one shows up again, say so rather than ignoring it silently --
+was current. If one shows up again, say so rather than ignoring it silently.
 its content is otherwise lost to the next thread.
 
 CONFIGURATION
@@ -66,7 +66,7 @@ def build_lines(directory, now=None):
 
     out = []
     if live:
-        out.append("[handoff] live tracks -- one file per track, updated in place "
+        out.append("[handoff] live tracks, one file per track, updated in place "
                    "(newest first):")
         for f in live:
             track = f.name[len("NOW-"):-len(".md")]

@@ -20,7 +20,7 @@ It says nothing at all when the index is clean, which is what makes it possible
 to leave running on every session start.
 
 Silence a false positive by putting the string 'lint-ok' anywhere on the index
-line. That is deliberately the crudest possible mechanism -- an escape hatch
+line. That is deliberately the crudest possible mechanism, an escape hatch
 that costs one word is an escape hatch people actually use, instead of turning
 the whole hook off.
 
@@ -44,7 +44,7 @@ GIT IS OPTIONAL
 If the memory directory is a git repository, two extra checks come alive:
 index drift (a file committed well after the index line that describes it) and
 dormancy by commit date. Without git, dormancy falls back to file modification
-time and drift is skipped -- it needs per-line history, which only blame has.
+time and drift is skipped, it needs per-line history, which only blame has.
 """
 import datetime
 import os
@@ -158,7 +158,7 @@ def main():
     if not mem.exists():
         return 0            # no memory directory configured: nothing to audit
     if not index.exists():
-        print(f"[memory] MEMORY.md MISSING -- the memory index is gone ({mem})")
+        print(f"[memory] MEMORY.md MISSING, the memory index is gone ({mem})")
         return 0
 
     today = datetime.date.today()
@@ -228,19 +228,19 @@ def main():
         review_due.append("  .last_full_review missing or unreadable")
 
     buckets = [
-        (dead, "! dead link(s) in the index -- file missing on disk:"),
-        (orphans, "! orphan memory file(s) -- on disk but in neither index "
+        (dead, "! dead link(s) in the index, file missing on disk:"),
+        (orphans, "! orphan memory file(s), on disk but in neither index "
                   "(add a line, or archive it):"),
-        (expired, "! expired deadline(s) in index text -- check and update the "
+        (expired, "! expired deadline(s) in index text, check and update the "
                   "line (or mark it 'lint-ok'):"),
-        (drift, "! index drift -- the file changed after its index line was last "
+        (drift, "! index drift, the file changed after its index line was last "
                 "touched; re-read the file, update the line, or acknowledge it "
                 "in .lint_ack as '<file> <hash>':"),
-        (dormant, "~ dormancy candidate(s) in active sections -- consider "
+        (dormant, "~ dormancy candidate(s) in active sections, consider "
                   "MEMORY_ARCHIVE.md (verify before archiving):"),
-        (oversize, "~ index over its size budget -- trim the one-liners, archive "
+        (oversize, "~ index over its size budget, trim the one-liners, archive "
                    "the finished ones (progressive disclosure):"),
-        (review_due, "~ full read-it-all memory review is DUE -- when it is done, "
+        (review_due, "~ full read-it-all memory review is DUE, when it is done, "
                      "write today's date into memory/.last_full_review:"),
     ]
     if not any(b for b, _ in buckets):

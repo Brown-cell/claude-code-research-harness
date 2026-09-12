@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Stop hook: a two-tier context handoff trigger.
 
-  Soft line -- ask for a handoff only if the work is at a natural stopping point.
-  Hard line -- ask unconditionally, before auto-compaction degrades the thread.
+  Soft line, ask for a handoff only if the work is at a natural stopping point.
+  Hard line, ask unconditionally, before auto-compaction degrades the thread.
 
 WHY TWO LINES
 -------------
@@ -21,7 +21,7 @@ WHY IT ESCALATES
 ----------------
 In the setup this came from, the nag was measured being ignored up to seven
 times in one session, while that session ran past 600k. Repeating yourself at
-600k is not free -- the reminder itself is charged at the context that made it
+600k is not free, the reminder itself is charged at the context that made it
 necessary. So the marker file carries a count: after three ignored nags the
 cooldown widens from 10 to 30 minutes and the wording gets blunter, instead of
 paying full price to say the same thing forever.
@@ -30,7 +30,7 @@ WHY IT READS A BOUNDED TAIL
 ---------------------------
 A transcript line can be several hundred kilobytes when an image is inlined.
 Reading the last 300 lines the naive way had to materialise ~100MB and blew the
-hook timeout on exactly the image-heavy sessions that cost the most -- so the
+hook timeout on exactly the image-heavy sessions that cost the most, so the
 sessions that needed the nag most were the ones that never got it. Read a
 bounded byte tail and scan it backwards.
 
@@ -56,8 +56,8 @@ MAX_LINES_SCANNED = 400         # candidate lines examined, newest first
 DEFAULT_SOFT, DEFAULT_HARD = 90_000, 150_000
 
 # Per-model lines. All three public models default to the same pair; the table
-# exists so that when one model's window is the scarce quota -- a weekly cap, a
-# more expensive tier -- you can tighten that one alone, e.g. ("opus": (70_000,
+# exists so that when one model's window is the scarce quota, a weekly cap, a
+# more expensive tier, you can tighten that one alone, e.g. ("opus": (70_000,
 # 120_000)). Matching is a substring test against the model id in the
 # transcript, because ids carry suffixes.
 MODEL_LINES = {
@@ -98,7 +98,7 @@ def lines_for(model, env=None):
 
 
 def tier(tokens, soft, hard):
-    """'hard', 'soft' or None -- which line this context has crossed."""
+    """'hard', 'soft' or None, which line this context has crossed."""
     if tokens >= hard:
         return "hard"
     if tokens >= soft:
@@ -212,7 +212,7 @@ def reason_text(kind, tokens, model, soft, hard, nags, directory):
     price = (f"Each further turn in this window costs about "
              f"{per_turn_cost(tokens)}k weighted tokens before any work happens.")
     where = directory / "NOW-<track>.md"
-    how = (f"Write it to {where} -- one file per track, overwritten in place. "
+    how = (f"Write it to {where}, one file per track, overwritten in place. "
            f"Do not accumulate dated files: they grow into a pile with no way to "
            f"tell which one is current. If your harness can spawn a subagent that "
            f"inherits this conversation, have that subagent write it, so the "
