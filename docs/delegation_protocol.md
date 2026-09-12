@@ -39,7 +39,7 @@ confident, not a duty.
 ## 2. Window economics
 
 This is the part most people miss, and it is measurable. In one week of my own
-usage, **51% of all spend was cache reads** -- re-reading context that had
+usage, **51% of all spend was cache reads**, re-reading context that had
 already been read. The parent window had taken in under 4M tokens of new
 material and paid for 149M in cache reads: roughly **39 re-reads per token**.
 
@@ -57,7 +57,7 @@ Multi-file reads, whole logs, first passes over documents and images go to a
 read-only subagent that returns a summary. A token the parent reads is charged
 again on every turn until that window dies.
 
-### Rule 1b: do not put it in the child windows either -- fan-out is a multiplier
+### Rule 1b: do not put it in the child windows either. Fan-out is a multiplier
 
 I learned this by hitting a monthly ceiling. Reading rule 1 as being about the
 parent only, I gave **64 subagents about 120KB of material each and had each use
@@ -72,7 +72,7 @@ What follows from it:
   goes in the file; the return value is a summary and a count.
 - **Put a tool budget in the prompt.** "Open one image, write one file, open
   nothing else." Turn count matters as much as input size, and unstated it
-  expands on its own -- one run reached 72 turns.
+  expands on its own, one run reached 72 turns.
 - **Make it idempotent to resume before you fire.** You cannot avoid limits;
   you can make hitting one cost nothing.
 
@@ -92,7 +92,7 @@ Cross the hard line and write a handoff even mid-task. See
 | Read many files, extract, cross-check | read-only subagent |
 
 If a judgement task turns out to need implementation, write the spec in the
-judgement window and send it down -- do not move windows. If an implementation
+judgement window and send it down, do not move windows. If an implementation
 window turns out to need a design decision, stop there and take it back up.
 
 ### Rule 4: subagents catch the same disease
@@ -107,8 +107,8 @@ The point is pacing, not austerity. If there is room, use it.
 ## 3. The unit of control is the engine, not the harness
 
 Worth knowing before you swap tools. Hooks belong to the engine that runs the
-tool calls, not to the interface you type into. In a controlled test -- same
-neutral harness, same script, only the engine swapped -- the run that went
+tool calls, not to the interface you type into. In a controlled test, same
+neutral harness, same script, only the engine swapped, the run that went
 through the Claude Code engine had its shell command recorded by the
 PreToolUse hook and blocked by a guard, and the run on another provider used
 the harness's own built-in shell tool and left no trace in the hook log at all.
@@ -117,7 +117,7 @@ So: **switching the interface keeps your guardrails; switching the engine
 removes them, silently.** Any rule that depends on a hook has to be restated as
 a prohibition the moment the engine changes.
 
-## 4. The spec template -- ten headings, fixed strings
+## 4. The spec template: ten headings, fixed strings
 
 Use these ten headings, in this order, with these exact names, for any
 delegation that writes something.
@@ -138,25 +138,27 @@ delegation that writes something.
 **No blank fields.** A heading with nothing to say gets one of four reserved
 words: `any` (receiver's choice), `defaults` (as in the agent definition),
 `none` (not part of this delegation), `-` (not applicable). A blank cannot be
-told apart from an omission.
+told apart from an omission. `hooks/spec_gate.py` checks all of this on every
+Agent call before the prompt is sent; a spec that fails it never leaves the
+parent window.
 
 ### Why fix the strings and not just the roles
 
 I pulled 122 real delegation prompts out of my own transcripts and counted. Six
 roles were being expressed with **49 different heading names**: the "background"
 role alone appeared under 14 different words. Exactly one role was written with
-a single consistent name -- "tool budget" -- and that was the one I had added
+a single consistent name, "tool budget", and that was the one I had added
 *as a named field* after the fan-out accident above.
 
-The other lesson from that same accident -- "write so a crash leaves something
-behind" -- I recorded as prose. It appeared in four prompts on one project and
+The other lesson from that same accident, "write so a crash leaves something
+behind", I recorded as prose. It appeared in four prompts on one project and
 never travelled to another.
 
 **Only a field with a name travels to the next job.** That is the whole reason
 the strings are fixed. And once the vocabulary is closed, a machine can check it.
 
 Measured against those 122 prompts, the three headings never used even once were
-`Discretion`, `Prohibited` and `Failure mode` -- precisely the three the old
+`Discretion`, `Prohibited` and `Failure mode`, precisely the three the old
 template did not have. The prompts that followed the old template followed it
 fine. What was missing was fields, not discipline.
 
@@ -171,7 +173,7 @@ must not move, and which way to lean when unsure.
 ### On `Failure mode`
 
 The worst way for delegated work to end is: it was on the plan, it dragged, and
-at the last minute the answer is "I could not do it". Two things are lost -- the
+at the last minute the answer is "I could not do it". Two things are lost: the
 chance to propose a fix, and all the time spent hesitating. The parent cannot
 intervene midway, so the only way to recover the first is to **land partial
 results early**. Write three things:
@@ -188,17 +190,17 @@ results early**. Write three things:
   check (or confirm the evidence of the run), read the diff. An independent
   verifier is an addition to that, never a replacement.
 - **Failure means**: the acceptance criteria were not met, or the contract was
-  broken -- an unverified assertion, a write outside the allowed paths, or the
+  broken, an unverified assertion, a write outside the allowed paths, or the
   acceptance criteria quietly relaxed.
 - On failure: improve the spec and re-delegate to the same tier **once**. Then
   move up a tier. Then take it back yourself. If you are stuck too, get an
-  independent diagnosis from a different model -- do not hit the same wall with
+  independent diagnosis from a different model, do not hit the same wall with
   the same head three times.
 - **Keep partial results.** Never throw away work because the run failed.
 - **When three or more workers run at once, stand up one verifier** whose only
   job is to check that the things they said they would write actually exist.
   Across two measured weeks, the share of runs that ended without producing the
-  artefact they promised went from 15% to 39% -- and the failure was not bad
+  artefact they promised went from 15% to 39%, and the failure was not bad
   output, it was *no* output. Reviewing quality does not catch that; checking
   existence does.
 
@@ -215,4 +217,4 @@ results early**. Write three things:
   variable.** Freeze the wording, the headings and the order; vary only the
   assignment.
 - When they are all done, the parent checks for contradictions between them --
-  terminology, paths, conclusions -- before synthesising.
+  terminology, paths, conclusions, before synthesising.

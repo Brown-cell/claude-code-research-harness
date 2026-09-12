@@ -1,6 +1,7 @@
 {
   "_comment": [
-    "Merge the 'hooks' block below into your .claude/settings.json. Six hooks:",
+    "Merge the 'hooks' block below into your .claude/settings.json. Seven hooks:",
+    "  PreToolUse       -> spec_gate.py            block a delegation whose spec lacks the ten headings",
     "  Stop             -> output_rules_guard.py   check the final message against rules/output_rules.json",
     "  Stop             -> handoff_stop.py         ask for a handoff at the soft (90k) and hard (150k) lines",
     "  SessionStart     -> memory_lint.py          audit the memory index; silent when clean",
@@ -42,6 +43,17 @@
           {
             "type": "command",
             "command": "python \"$CLAUDE_PROJECT_DIR/hooks/handoff_sessionstart.py\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/hooks/spec_gate.py\""
           }
         ]
       }
