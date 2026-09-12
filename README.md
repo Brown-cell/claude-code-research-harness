@@ -132,6 +132,37 @@ one blank. It is the newest file here and the one the `prose_rule_guard`
 would have asked for, since the rest of that section was prose until it was
 written.
 
+## Next to the others
+
+The larger repositories that attack the same "I told it once" problem do it by
+remembering the correction. [pro-workflow](https://github.com/rohitg00/pro-workflow)
+turns each one into a rule in SQLite and loads the rules at session start;
+[Continuous-Claude-v3](https://github.com/parcadei/Continuous-Claude-v3) has a
+daemon extract learnings into PostgreSQL. Claude Code's own auto-memory is the
+same route with Markdown files. All three end with the model reading a note
+and deciding to follow it, which is the step that failed in the first place.
+Here a correction becomes a regular expression, and the check runs on the
+finished message and exits 2. The model is not consulted. The turn does not
+end until the sentence is fixed.
+
+| | a correction is stored as | what stops the repeat | to run it |
+| --- | --- | --- | --- |
+| this repository | a regex in a JSON table, with sentences it must let through | Stop hook, exit 2 | Python |
+| pro-workflow | a rule in SQLite (FTS5), loaded at session start | the model reading the rule | Node, an npm build, SQLite |
+| Continuous-Claude-v3 | a learning in PostgreSQL + pgvector, extracted by a daemon | the model recalling it | Docker, PostgreSQL, uv |
+| Claude Code auto-memory | a line in a Markdown file, `MEMORY.md` injected each session | the model reading the note | nothing, it is built in |
+
+None of them, as far as I have read, asks a rule to state what it must not
+catch. That is the first of the three ideas above, and the one I would keep
+if I had to drop the rest.
+
+[cc-safety-net](https://github.com/kenryu42/cc-safety-net) and
+[claude-code-hooks-mastery](https://github.com/disler/claude-code-hooks-mastery)
+sit at a different layer: they block tool calls (`rm -rf`, reads of `.env`)
+before they run. Nothing here does that, and nothing here conflicts with
+them. `spec_gate.py` is the only PreToolUse hook in this repository and it
+looks at one tool, the Agent call.
+
 ## Install
 
 1. Copy `hooks/` and `rules/` into your project.
@@ -223,6 +254,8 @@ rule in the following week has understood the whole thing.
   what language the patterns are in.
 - Hooks run on every turn. Keep them fast, and keep them quiet when there is
   nothing to say.
+- The guard reads Claude Code's transcript format and nothing else. Codex,
+  Cursor and the other CLIs are not supported, and I have not tried.
 - Tested on Windows with CPython 3.12 and on Ubuntu in CI with 3.11 and 3.12.
   No third-party dependencies. `pytest tests/` is the check.
 
