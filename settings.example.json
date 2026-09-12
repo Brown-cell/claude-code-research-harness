@@ -1,0 +1,76 @@
+{
+  "_comment": [
+    "Merge the 'hooks' block below into your .claude/settings.json. Six hooks:",
+    "  Stop             -> output_rules_guard.py   check the final message against rules/output_rules.json",
+    "  Stop             -> handoff_stop.py         ask for a handoff at the soft (90k) and hard (150k) lines",
+    "  SessionStart     -> memory_lint.py          audit the memory index; silent when clean",
+    "  SessionStart     -> handoff_sessionstart.py list the live handoff tracks",
+    "  PostToolUse      -> prose_rule_guard.py     ask whether a rule being written as prose could be a check",
+    "  UserPromptSubmit -> output_rules_preflight.py  inject the rules you broke in the last 7 days",
+    "$CLAUDE_PROJECT_DIR is expanded by Claude Code, which is how every path here stays relative.",
+    "Replace 'python' with a full interpreter path if the one you want is not on PATH.",
+    "Keys starting with an underscore are comments and are ignored."
+  ],
+
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/hooks/output_rules_guard.py\""
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/hooks/handoff_stop.py\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/hooks/memory_lint.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/hooks/handoff_sessionstart.py\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/hooks/prose_rule_guard.py\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/hooks/output_rules_preflight.py\""
+          }
+        ]
+      }
+    ]
+  },
+
+  "env": {
+    "_comment": "All optional. Delete the ones you do not need; the defaults are described in the README.",
+    "PYTHONUTF8": "1"
+  }
+}

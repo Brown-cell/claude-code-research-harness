@@ -1,0 +1,1 @@
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Just run the migration on the replica first. The p95 is 420ms, so it should work."}]}}

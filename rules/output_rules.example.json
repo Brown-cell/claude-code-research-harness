@@ -1,0 +1,104 @@
+{
+  "_doc": "Rules for checking the final assistant message. The Stop hook (hooks/output_rules_guard.py) reads this file every turn, and the UserPromptSubmit hook (hooks/output_rules_preflight.py) reads it to name the rules you broke this week. This is a file that grows: when you are told the same thing twice, add one line here instead of writing another paragraph of prose somewhere.",
+  "_why_here": "Not next to the hooks. If your setup protects the hooks directory from the agent, a rule table kept there needs a human to unlock it for every new line, and 'convert the instruction into a check while it is still fresh' stops being possible. Code is dangerous and stays locked; data lives out here where it can be edited immediately.",
+
+  "_schema": {
+    "name": "display name (required)",
+    "kind": "define | forbid | require (default: define)",
+    "pattern": "detection regex (required)",
+    "gloss": "define only: the shortest honest restatement, to go in the parenthesis on first use",
+    "message": "forbid/require only: what to write instead",
+    "requires": "require only: a regex that must appear somewhere in the message if `pattern` did",
+    "negative": "forbid/require only (required): example sentence(s) that must NOT fire. The hook checks these at load time and refuses to run if one of them fires."
+  },
+  "_admission_rule": "A forbid/require line with no `negative` is treated as a broken configuration and stops the whole check. Any rule that widens the net must carry an example of a sentence that should escape it. Reason: this hook runs on every single message, so a net that is too wide becomes a landmine that interrupts unrelated work every day. When you find a real false positive, add that exact sentence to `negative` -- then the same false positive can never come back.",
+  "_how_to_start": "Delete the rules you do not want. Seven is already more than most people need on day one; two rules that fire on real habits beat twelve that fire on nothing.",
+
+  "rules": [
+    {
+      "name": "p95",
+      "kind": "define",
+      "pattern": "\\bp95\\b",
+      "gloss": "the 95th percentile: 1 request in 20 is slower than this",
+      "_why": "An abbreviation you use daily is invisible to you and opaque to everyone else. The fix is not a glossary at the end of the document -- that makes the reader's eyes travel. Gloss it where it appears, once."
+    },
+    {
+      "name": "MTTR",
+      "kind": "define",
+      "pattern": "\\bMTTR\\b",
+      "gloss": "mean time to restore service once an incident has started"
+    },
+
+    {
+      "name": "minimising words",
+      "kind": "forbid",
+      "pattern": "(?i)\\b(?:simply|just)\\s+(?:run|add|use|call|change|set|install|delete|remove|restart|rerun|edit)\\b",
+      "message": "Drop the word. 'Simply run the migration' tells the reader their difficulty is their own fault, and it hides the work: if it really is one command, the command alone says so. Write the command.",
+      "negative": [
+        "I just ran the suite again and it passed on the second attempt.",
+        "This simply is not reproducible on the build machine.",
+        "The runbook says to \"simply restart the service\", which is the sentence I want to delete."
+      ],
+      "_measured": "The third negative is the carve-out that matters: a forbidden phrase inside a quotation does not fire. Otherwise you could not talk about the rule at all -- not even to propose deleting the phrase."
+    },
+    {
+      "name": "internal section and check identifiers",
+      "kind": "forbid",
+      "pattern": "§\\s*[0-9]|(?<![A-Za-z0-9])(?!(?:US|EU|AP|UK|JP|CA|SA)-)[A-Z]{1,2}-[0-9]+(?![A-Za-z0-9])\\s*(?:is|was|says|applies|fires|failed|covers|means)",
+      "message": "A section number or a check id says nothing to a reader who does not have your document open. Name the thing: not 'B-6 fired' but 'the check that counts how many words are bolded'. If you want to cite the source, put the identifier in a code span so it reads as an address rather than a word.",
+      "negative": [
+        "Ticket ABC-123 is closed; the regression test landed with it.",
+        "The address of the convention is `REPORTING.md §2` and it stays as written.",
+        "We use US-1 as the region label in the examples.",
+        "US-1 is the region the staging cluster runs in.",
+        "The check that counts bolded words fired on the summary section."
+      ],
+      "_measured": "The fourth negative is a real false positive, caught while writing this file: a cloud region label has exactly the shape of an internal check id. It is now excluded by name, and the sentence sits here so the same false positive can never come back. That is the intended workflow for every rule in this file."
+    },
+
+    {
+      "name": "saying it works without running it",
+      "kind": "require",
+      "pattern": "\\b(?:should work|should be fine|probably works|ought to work|will work fine)\\b",
+      "requires": "unverified|untested|not (?:yet )?(?:tested|verified|run)|have not (?:run|tested|verified)|did not run|assumption|I am guessing",
+      "message": "If you have not executed it, say so in the same sentence: 'unverified -- I have not run this on Windows'. Mixing what you ran with what you expect is the one failure mode that makes the whole report unusable, because the reader can no longer tell which half to trust.",
+      "negative": [
+        "I ran the suite: 41 passed, 0 failed.",
+        "This should work on Windows as well -- unverified, I only ran it on Linux.",
+        "The fix works: the test that was failing now passes."
+      ]
+    },
+    {
+      "name": "claim that survives a change of conditions",
+      "kind": "require",
+      "pattern": "(?:even if|even when|once you|after you)[^.\\n]{0,45}(?:it (?:will )?(?:still )?(?:work|keep working|be fine)|nothing (?:will )?break|it (?:will not|won't) (?:break|stop|fail))",
+      "requires": "unverified|untested|not tested|if (?:that|this|it) is wrong|falsif|counter-?example|would look like|I have not",
+      "message": "'It keeps working even if X' is a claim about a state that does not exist right now, so no amount of reading the code makes it observed. Either say in one line what you would see if it were false, or label it unverified. Citing evidence is not enough on its own: the trap is reading one thing carefully and then making a claim about something adjacent.",
+      "negative": [
+        "Even if the cache is cold it will work -- unverified; if that is wrong the first request times out.",
+        "The tests passed after I fixed the import path.",
+        "Once you install the hook, the session start output gets one more line."
+      ]
+    },
+    {
+      "name": "threshold on a signal of unknown resolution",
+      "kind": "require",
+      "pattern": "(?:set|add|put|place|wire)\\s+(?:a|an|the)\\s+(?:threshold|alert|alarm|gate)|(?:threshold|alert|alarm|gate)\\s+(?:on|for)\\s+(?:the\\s+)?[a-z_]*\\s*(?:metric|score|signal|rate|index)",
+      "requires": "n\\s*=\\s*[0-9]|false positive|noise|baseline|resolution|signal-to-noise|unverified|how often it fires",
+      "message": "Before putting a threshold on a measurement, say what the measurement can resolve: how many observations you have, and how big an effect it could detect. A threshold on a signal whose noise you have never measured is a way of manufacturing a reason after the alarm has already rung.",
+      "negative": [
+        "The client timeout is 30s, set in the config file.",
+        "We set a threshold of 0.8 after measuring the false positive rate at n=120.",
+        "Remove the alert on the queue depth metric: it fired 40 times and every one was noise."
+      ]
+    }
+  ],
+
+  "_not_convertible": [
+    {
+      "rule": "When you hand the user a command to run, give the whole thing in one block they can paste.",
+      "why": "Tried and abandoned. Scanning thousands of real messages for 'asks the user to do something, no code block' produced dozens of hits and none of them were commands -- they were 'correct me if this is wrong', 'send me the file if you have it'. The actual violation is 'the block I gave is split across two places, or needs editing before it runs', and judging that requires knowing whether the block is executable as printed. No regex expresses it.",
+      "status": "Still prose. Do not add a rule that never fires: a rule that cannot fire looks like the problem is handled, which is worse than knowing it is not."
+    }
+  ]
+}

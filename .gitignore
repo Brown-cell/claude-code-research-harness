@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.log
+.env
+logs/
+
+# Written by the hooks at runtime, never committed.
+rules/output_rules.json
+.prose_rule_seen.json
+hooks/.prose_rule_seen.json
