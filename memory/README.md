@@ -7,10 +7,15 @@ on every single turn, and the files behind it are paid for only when read.**
 
 Everything below follows from that.
 
+The layout itself (one fact per file, the four prefixes, a `MEMORY.md` index
+of one-line pointers) is Claude Code's own auto-memory convention. I did not
+invent it. What is mine is the budget on the index, the archive underneath it,
+and the lint that watches both; those are what the rest of this page is about.
+
 ## One fact per file
 
 A memory file holds one durable fact and its consequences. Not one project, not
-one topic -- one fact. "The user does not want X" is a file. "How the build
+one topic, one fact. "The user does not want X" is a file. "How the build
 pipeline is wired" is a file. When two facts share a file, one of them gets
 found and the other one does not, because whoever searches is searching for the
 first.
@@ -37,12 +42,12 @@ correction is given, it either becomes a file or it will be given again.
 ## The index has a budget
 
 `MEMORY.md` is a list of one-line pointers, grouped under a few headings. Each
-line is a link plus the shortest possible hook -- **enough to know whether to
+line is a link plus the shortest possible hook, **enough to know whether to
 open the file, and not one word more.**
 
 The budget in the lint is **110 lines / 18000 bytes**. It is not a style
 preference. Past that, the injection starts costing real money on every turn,
-and -- worse -- the index starts being skimmed instead of read, at which point a
+and, worse, the index starts being skimmed instead of read, at which point a
 longer index conveys *less* than a shorter one.
 
 Two rules keep it inside the budget:
@@ -68,7 +73,7 @@ not, and then the whole lint gets switched off instead.
 Use it for real exceptions, and say why:
 
 ```markdown
-- [Separations background](reference_separations.md) -- keep even though dormant;
+- [Separations background](reference_separations.md), keep even though dormant;
   the technique is planned for next year (lint-ok)
 ```
 
@@ -81,13 +86,13 @@ Two files that contradict each other, or a durable fact buried inside a file
 about something else, cannot be found by pattern matching. Every few weeks, read
 the whole directory as if you had never seen it, and ask of each file: is this
 still true, is it findable, does it contradict anything. Write the date into
-`.last_full_review` when you are done -- the lint's final reminder is keyed off
+`.last_full_review` when you are done, the lint's final reminder is keyed off
 that file, and it is the only bucket that is about your attention rather than
 the directory's contents.
 
 ## Files here
 
-- [`MEMORY.example.md`](MEMORY.example.md) -- what an index looks like.
-- [`example_feedback.md`](example_feedback.md) -- what one file looks like,
+- [`MEMORY.example.md`](MEMORY.example.md), what an index looks like.
+- [`example_feedback.md`](example_feedback.md), what one file looks like,
   including the front matter and the two sections that make a correction usable
   by a future session.

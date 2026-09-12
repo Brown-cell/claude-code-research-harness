@@ -16,7 +16,7 @@ them.
 ## Why
 
 Given twice, three weeks apart. The second time, a report said a script "handles
-the missing-column case" -- true of the code as written, never once executed.
+the missing-column case", true of the code as written, never once executed.
 The column was missing in the real data and the run died forty minutes in.
 
 The damage is not the wrong guess. Guesses are fine and often necessary. The
@@ -43,7 +43,7 @@ confident, because careful reading is what produces the confidence.
 - Never mix the two in one paragraph. If a paragraph has both, split it.
 
 Good: *"The suite passes: 41 passed, 0 failed. Unverified: I expect the Windows
-path to work too, but I have not run it there -- if it is wrong, the failure
+path to work too, but I have not run it there, if it is wrong, the failure
 will be a path separator in `resolve_config`."*
 
 Bad: *"Fixed and tested, should be fine on Windows as well."*
@@ -51,7 +51,7 @@ Bad: *"Fixed and tested, should be fine on Windows as well."*
 ## What it does not mean
 
 It does not mean hedging everything. A verified statement should be flat and
-confident with no qualifier at all -- weakening those is the same failure in the
+confident with no qualifier at all, weakening those is the same failure in the
 other direction, because a report where every sentence is hedged is one where
 the reader learns nothing about which parts are solid.
 
