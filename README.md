@@ -3,6 +3,9 @@
 [![tests](https://github.com/Brown-cell/claude-code-research-harness/actions/workflows/tests.yml/badge.svg)](https://github.com/Brown-cell/claude-code-research-harness/actions/workflows/tests.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+Hooks and conventions for [Claude Code](https://docs.anthropic.com/en/docs/claude-code),
+for people who use it every day on the same project for months.
+
 You tell Claude Code something. It agrees. Four days later it does the same
 thing again, and the instruction was in CLAUDE.md the whole time.
 
